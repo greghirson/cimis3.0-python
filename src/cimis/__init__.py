@@ -11,8 +11,20 @@ Quick start::
     )
 """
 
-from . import constants
+from . import constants, geo
+from .cache import ResponseCache
 from .client import CimisClient, DEFAULT_BASE_URL
+from .geo import (
+    NearbyStation,
+    haversine_km,
+    nearest_stations,
+    records_to_geodataframe,
+    records_to_geojson,
+    stations_in_bbox,
+    stations_to_geodataframe,
+    stations_to_geojson,
+    stations_within,
+)
 from .exceptions import (
     CimisApiError,
     CimisAuthError,
@@ -35,6 +47,17 @@ __version__ = "0.1.0"
 __all__ = [
     "CimisClient",
     "DEFAULT_BASE_URL",
+    "ResponseCache",
+    "NearbyStation",
+    "haversine_km",
+    "nearest_stations",
+    "stations_within",
+    "stations_in_bbox",
+    "stations_to_geojson",
+    "records_to_geojson",
+    "stations_to_geodataframe",
+    "records_to_geodataframe",
+    "geo",
     "CimisError",
     "CimisApiError",
     "CimisAuthError",

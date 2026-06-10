@@ -15,6 +15,7 @@ station/spatial zip code service.
 ```bash
 pip install .            # from this repository
 pip install ".[pandas]"  # with DataFrame support
+pip install ".[geo]"     # with geopandas/GeoDataFrame support
 ```
 
 ## Authentication
@@ -96,6 +97,56 @@ missing/qualified data (the value will be `None`).
 from cimis import to_dataframe
 
 df = to_dataframe(records)  # one row per record, items as numeric columns
+```
+
+### Geospatial helpers
+
+Find stations near a point (haversine distance, no extra dependencies):
+
+```python
+# Three closest active stations to downtown Sacramento
+for ns in client.find_nearest_stations(38.5816, -121.4944, n=3):
+    print(ns.station.name, f"{ns.distance_km:.1f} km")
+
+client.stations_within(38.5816, -121.4944, radius_km=40)
+client.stations_in_bbox(36.0, -122.0, 39.0, -119.0)
+
+# Fetch data from the nearest station that actually covers the date range
+# (skips stations that weren't operating then, falls back to the next nearest)
+records, nearest = client.get_data_near(
+    38.5816, -121.4944, start_date="2024-06-01", end_date="2024-06-30"
+)
+print(f"data from {nearest.station.name}, {nearest.distance_km:.1f} km away")
+```
+
+Export for mapping (GeoJSON is dependency-free; GeoDataFrames need the
+`geo` extra):
+
+```python
+from cimis import stations_to_geojson, records_to_geojson
+from cimis import stations_to_geodataframe, records_to_geodataframe
+
+geojson = stations_to_geojson(client.get_all_stations())
+gdf = records_to_geodataframe(records, stations=client.get_all_stations())
+```
+
+Spatial (SCS) records carry their own coordinates; station (WSN) records are
+located via the `stations=` list. The same helpers are available as pure
+functions in `cimis.geo` if you already have station/record lists.
+
+### Caching
+
+Pass `cache=True` to persist responses in `~/.cache/cimis/cache.sqlite`
+(or pass a path). Weather responses whose date range is fully in the past
+are cached indefinitely — historical CIMIS data doesn't change — while
+ranges touching today are never cached, since recent values may still be
+revised by quality control. Station/zip metadata is cached for
+`metadata_ttl` seconds (default 24 h).
+
+```python
+client = CimisClient(cache=True)               # default location
+client = CimisClient(cache="my-cache.sqlite")  # custom path
+client.cache.clear()                           # drop everything cached
 ```
 
 ### Units and data items
