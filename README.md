@@ -12,6 +12,21 @@ station/spatial zip code service.
 
 ## Installation
 
+Install directly from GitHub:
+
+```bash
+pip install "git+https://github.com/greghirson/cimis3.0-python.git"
+
+# with optional extras
+pip install "cimis[pandas] @ git+https://github.com/greghirson/cimis3.0-python.git"
+pip install "cimis[geo] @ git+https://github.com/greghirson/cimis3.0-python.git"
+
+# or with uv
+uv pip install "git+https://github.com/greghirson/cimis3.0-python.git"
+```
+
+Or from a local clone:
+
 ```bash
 pip install .            # from this repository
 pip install ".[pandas]"  # with DataFrame support
